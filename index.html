@@ -109,17 +109,6 @@
   .poss.left  { border-right: 9px solid var(--accent); }
   .poss.right { border-left: 9px solid var(--accent); }
   .poss.on { opacity: 1; }
-
-  .live-dot {
-    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-    background: #ff4d4d; box-shadow: 0 0 7px #ff4d4d;
-    margin-right: 6px; vertical-align: middle;
-    animation: pulse 1.4s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50%     { opacity: 0.35; transform: scale(0.7); }
-  }
 </style>
 </head>
 <body>
@@ -239,7 +228,7 @@
       periodLabel = "Q" + periodNumber;
     }
     centerPrimary.textContent = displayClock;
-    centerSecondary.innerHTML = '<span class="live-dot"></span>' + periodLabel;
+    centerSecondary.textContent = periodLabel;
   }
 
   function setPollInterval(intervalMilliseconds) {

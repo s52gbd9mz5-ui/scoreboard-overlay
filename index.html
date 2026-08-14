@@ -18,8 +18,8 @@
     --accent: #e8c04a;
 
     /* ---- SIZE CONTROL: change this one number ---- */
-    /* 1 = original size, 0.55 = current, 0.4 = smaller still */
-    --scale: 0.55;
+    /* 1 = full size, 0.4 = current, 0.3 = even smaller */
+    --scale: 0.4;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -28,7 +28,7 @@
     font-family: 'Saira Condensed', 'Arial Narrow', sans-serif;
   }
   #anchor {
-    position: fixed; left: 50%; bottom: 30px;
+    position: fixed; left: 50%; bottom: 24px;
     transform: translateX(-50%);
   }
   #stage {
@@ -120,16 +120,6 @@
     0%,100% { opacity: 1; transform: scale(1); }
     50%     { opacity: 0.35; transform: scale(0.7); }
   }
-
-  #diag {
-    position: fixed; left: 10px; bottom: 6px;
-    font-size: 11px; font-weight: 600;
-    color: rgba(255,255,255,0.45);
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-  }
-  #diag.bad  { color: rgba(255,90,90,0.95); }
-  #diag.demo { color: rgba(120,200,255,0.95); }
 </style>
 </head>
 <body>
@@ -158,8 +148,6 @@
   </div>
 </div>
 
-<div id="diag">starting...</div>
-
 <script>
   var GAME_ID = "401873276";                                                    // TB @ NYJ, ESPN event id
   var SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard";
@@ -179,7 +167,6 @@
   var stripSubEl = document.getElementById('stripSub');
   var possLeftEl = document.getElementById('possLeft');
   var possRightEl = document.getElementById('possRight');
-  var diagEl = document.getElementById('diag');
 
   var quarterLabels = { 1: "1ST", 2: "2ND", 3: "3RD", 4: "4TH", 5: "OT" };
 
@@ -194,9 +181,8 @@
     return String(value).padStart(2, '0');
   }
 
-  function setDiag(cssClass, messageText) {
-    diagEl.className = cssClass;
-    diagEl.textContent = messageText;
+  function logStatus(messageText) {                                             // console only, nothing on screen
+    console.log("[scorebar] " + messageText);
   }
 
   function flashScore(element) {
@@ -270,7 +256,7 @@
   /* ---- demo: 2nd quarter drive ending in a Jets touchdown ---- */
   function runDemo() {
     gamePhase = "in";
-    setDiag('demo', "DEMO MODE - simulated, not live data");
+    logStatus("DEMO MODE - simulated, not live data");
 
     var jetsScore = 10;
     var bucsScore = 7;
@@ -327,7 +313,7 @@
           i = i + 1;
         }
         if (matchedEvent === null) {
-          setDiag('bad', "game not in feed yet");
+          logStatus("game not in feed yet");
           return;
         }
 
@@ -364,7 +350,7 @@
             { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
           setPossession("none");
           setPollInterval(POLL_PREGAME_MS);
-          setDiag('', "connected - waiting for kickoff");
+          logStatus("connected - waiting for kickoff");
           return;
         }
 
@@ -378,7 +364,7 @@
           stripSubEl.textContent = "";
           setPossession("none");
           setPollInterval(POLL_PREGAME_MS);
-          setDiag('', "final");
+          logStatus("final");
           return;
         }
 
@@ -422,15 +408,10 @@
         }
 
         setPollInterval(POLL_LIVE_MS);
-        setDiag('', "live - updated " + lastGoodUpdate.toLocaleTimeString());
+        logStatus("live - updated " + lastGoodUpdate.toLocaleTimeString());
       })
       .catch(function (error) {
-        console.error("scoreboard fetch failed:", error);
-        var staleNote = "";
-        if (lastGoodUpdate !== null) {
-          staleNote = " (last ok " + lastGoodUpdate.toLocaleTimeString() + ")";
-        }
-        setDiag('bad', "feed unreachable - retrying" + staleNote);
+        console.error("[scorebar] fetch failed:", error);
       });
   }
 

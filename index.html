@@ -16,6 +16,10 @@
     --center-bg: #3a3f45;
     --white: #ffffff;
     --accent: #e8c04a;
+
+    /* ---- SIZE CONTROL: change this one number ---- */
+    /* 1 = original size, 0.55 = current, 0.4 = smaller still */
+    --scale: 0.55;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -23,9 +27,13 @@
     width: 100%; height: 100%; overflow: hidden;
     font-family: 'Saira Condensed', 'Arial Narrow', sans-serif;
   }
-  #stage {
-    position: fixed; left: 50%; bottom: 40px;
+  #anchor {
+    position: fixed; left: 50%; bottom: 30px;
     transform: translateX(-50%);
+  }
+  #stage {
+    transform: scale(var(--scale));
+    transform-origin: bottom center;
     display: flex; flex-direction: column; align-items: center;
     filter: drop-shadow(0 8px 20px rgba(0,0,0,0.6));
   }
@@ -114,35 +122,39 @@
   }
 
   #diag {
-    position: fixed; left: 12px; bottom: 6px;
-    font-size: 10px; color: rgba(255,255,255,0.4);
+    position: fixed; left: 10px; bottom: 6px;
+    font-size: 11px; font-weight: 600;
+    color: rgba(255,255,255,0.45);
     letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
   }
-  #diag.bad  { color: rgba(255,90,90,0.9); }
-  #diag.demo { color: rgba(120,200,255,0.9); }
+  #diag.bad  { color: rgba(255,90,90,0.95); }
+  #diag.demo { color: rgba(120,200,255,0.95); }
 </style>
 </head>
 <body>
 
-<div id="stage">
-  <div class="bar">
-    <div class="cap left">NYJ</div>
-    <div class="score" id="scoreLeft">0</div>
-    <div class="center-wrap">
-      <div class="center-box countdown" id="centerBox">
-        <div class="center-primary" id="centerPrimary">--:--:--</div>
-        <div class="center-secondary" id="centerSecondary">TIL KICKOFF</div>
+<div id="anchor">
+  <div id="stage">
+    <div class="bar">
+      <div class="cap left">NYJ</div>
+      <div class="score" id="scoreLeft">0</div>
+      <div class="center-wrap">
+        <div class="center-box countdown" id="centerBox">
+          <div class="center-primary" id="centerPrimary">--:--:--</div>
+          <div class="center-secondary" id="centerSecondary">TIL KICKOFF</div>
+        </div>
       </div>
+      <div class="score" id="scoreRight">0</div>
+      <div class="cap right">TB</div>
     </div>
-    <div class="score" id="scoreRight">0</div>
-    <div class="cap right">TB</div>
-  </div>
 
-  <div class="strip" id="strip">
-    <span class="poss left" id="possLeft"></span>
-    <span class="strip-text" id="stripText">MetLife Stadium</span>
-    <span class="strip-sub" id="stripSub"></span>
-    <span class="poss right" id="possRight"></span>
+    <div class="strip" id="strip">
+      <span class="poss left" id="possLeft"></span>
+      <span class="strip-text" id="stripText">MetLife Stadium</span>
+      <span class="strip-sub" id="stripSub"></span>
+      <span class="poss right" id="possRight"></span>
+    </div>
   </div>
 </div>
 
@@ -423,6 +435,7 @@
   }
 
   if (DEMO_MODE) {
+    renderCountdown();
     runDemo();
   } else {
     renderCountdown();

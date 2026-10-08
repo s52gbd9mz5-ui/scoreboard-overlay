@@ -3,22 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NYJ vs TB - Scorebar</title>
+<title>BKN vs PHI - Scorebar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --jets: #115740;
-    --bucs: #bd1c36;
+    --nets: #0c0c0e;
+    --sixers: #1d428a;
     --bar-bg: rgba(18, 20, 24, 0.85);
     --strip-bg: rgba(10, 12, 15, 0.92);
     --center-bg: #3a3f45;
     --white: #ffffff;
     --accent: #e8c04a;
-
-    /* ---- SIZE CONTROL: change this one number ---- */
-    /* 1 = full size, 0.4 = current, 0.3 = even smaller */
     --scale: 0.4;
   }
   * { box-sizing: border-box; }
@@ -27,10 +24,7 @@
     width: 100%; height: 100%; overflow: hidden;
     font-family: 'Saira Condensed', 'Arial Narrow', sans-serif;
   }
-  #anchor {
-    position: fixed; left: 50%; bottom: 24px;
-    transform: translateX(-50%);
-  }
+  #anchor { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); }
   #stage {
     transform: scale(var(--scale));
     transform-origin: bottom center;
@@ -38,7 +32,6 @@
     filter: drop-shadow(0 8px 20px rgba(0,0,0,0.6));
   }
   .bar { display: flex; align-items: stretch; height: 88px; }
-
   .cap {
     display: flex; align-items: center; justify-content: center;
     min-width: 168px; padding: 0 22px;
@@ -46,22 +39,20 @@
     letter-spacing: -1px; color: var(--white);
     text-shadow: 2px 2px 0 rgba(0,0,0,0.35), 0 3px 10px rgba(0,0,0,0.4);
   }
-  .cap.left  { background: var(--jets); }
-  .cap.right { background: var(--bucs); }
-
+  .cap.left  { background: var(--nets); border-right: 1px solid rgba(255,255,255,0.12); }
+  .cap.right { background: var(--sixers); }
   .score {
     display: flex; align-items: center; justify-content: center;
-    background: var(--bar-bg); min-width: 118px;
+    background: var(--bar-bg); min-width: 128px;
     font-weight: 800; font-size: 70px; line-height: 1; color: var(--white);
     font-variant-numeric: tabular-nums; letter-spacing: -2px;
     text-shadow: 0 3px 8px rgba(0,0,0,0.45);
   }
   .score.flash { animation: scoreFlash 1.6s ease-out; }
   @keyframes scoreFlash {
-    0%, 35% { color: var(--accent); transform: scale(1.15); }
+    0%, 35% { color: var(--accent); transform: scale(1.12); }
     100%    { color: var(--white);  transform: scale(1); }
   }
-
   .center-wrap {
     display: flex; align-items: center; justify-content: center;
     background: var(--bar-bg); padding: 0 14px;
@@ -83,10 +74,9 @@
   .center-box.countdown { min-width: 156px; }
   .center-box.countdown .center-primary { font-size: 34px; }
   .center-box.countdown .center-secondary { font-size: 13px; letter-spacing: 2px; }
-
   .strip {
     background: var(--strip-bg);
-    min-width: 340px;
+    min-width: 380px;
     padding: 6px 20px 7px;
     display: flex; align-items: center; justify-content: center; gap: 18px;
     border-top: 2px solid rgba(255,255,255,0.10);
@@ -101,14 +91,6 @@
     color: #9aa0a8; text-transform: uppercase; white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
-  .poss {
-    width: 0; height: 0;
-    border-top: 6px solid transparent; border-bottom: 6px solid transparent;
-    opacity: 0;
-  }
-  .poss.left  { border-right: 9px solid var(--accent); }
-  .poss.right { border-left: 9px solid var(--accent); }
-  .poss.on { opacity: 1; }
 </style>
 </head>
 <body>
@@ -116,48 +98,42 @@
 <div id="anchor">
   <div id="stage">
     <div class="bar">
-      <div class="cap left">NYJ</div>
+      <div class="cap left">BKN</div>
       <div class="score" id="scoreLeft">0</div>
       <div class="center-wrap">
         <div class="center-box countdown" id="centerBox">
           <div class="center-primary" id="centerPrimary">--:--:--</div>
-          <div class="center-secondary" id="centerSecondary">TIL KICKOFF</div>
+          <div class="center-secondary" id="centerSecondary">TIL TIPOFF</div>
         </div>
       </div>
       <div class="score" id="scoreRight">0</div>
-      <div class="cap right">TB</div>
+      <div class="cap right">PHI</div>
     </div>
 
     <div class="strip" id="strip">
-      <span class="poss left" id="possLeft"></span>
-      <span class="strip-text" id="stripText">MetLife Stadium</span>
+      <span class="strip-text" id="stripText">Barclays Center</span>
       <span class="strip-sub" id="stripSub"></span>
-      <span class="poss right" id="possRight"></span>
     </div>
   </div>
 </div>
 
 <script>
-  var GAME_ID = "401873276";                                                    // TB @ NYJ, ESPN event id
-  var SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard";
-  var POLL_PREGAME_MS = 30000;
+  var GAME_ID = "401901823";
+  var SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard";
+  var POLL_PREGAME_MS = 20000;
   var POLL_LIVE_MS = 8000;
 
-  var DEMO_MODE = window.location.search.indexOf("demo=1") !== -1;              // add ?demo=1 to test
+  var DEMO_MODE = window.location.search.indexOf("demo=1") !== -1;
 
-  var kickoffTime = new Date(Date.UTC(2026, 7, 14, 23, 0, 0));                  // 7:00 PM ET fallback
+  var tipoffTime = new Date(Date.UTC(2026, 9, 8, 23, 30, 0));
 
-  var scoreLeftEl = document.getElementById('scoreLeft');                       // NYJ (home)
-  var scoreRightEl = document.getElementById('scoreRight');                     // TB (away)
+  var scoreLeftEl = document.getElementById('scoreLeft');
+  var scoreRightEl = document.getElementById('scoreRight');
   var centerBox = document.getElementById('centerBox');
   var centerPrimary = document.getElementById('centerPrimary');
   var centerSecondary = document.getElementById('centerSecondary');
   var stripTextEl = document.getElementById('stripText');
   var stripSubEl = document.getElementById('stripSub');
-  var possLeftEl = document.getElementById('possLeft');
-  var possRightEl = document.getElementById('possRight');
-
-  var quarterLabels = { 1: "1ST", 2: "2ND", 3: "3RD", 4: "4TH", 5: "OT" };
 
   var pollTimer = null;
   var currentPollInterval = 0;
@@ -170,13 +146,23 @@
     return String(value).padStart(2, '0');
   }
 
-  function logStatus(messageText) {                                             // console only, nothing on screen
+  function logStatus(messageText) {
     console.log("[scorebar] " + messageText);
+  }
+
+  function periodLabelFor(periodNumber) {
+    if (periodNumber === 1) { return "1ST"; }
+    if (periodNumber === 2) { return "2ND"; }
+    if (periodNumber === 3) { return "3RD"; }
+    if (periodNumber === 4) { return "4TH"; }
+    if (periodNumber === 5) { return "OT"; }
+    if (periodNumber > 5) { return (periodNumber - 4) + "OT"; }
+    return "Q" + periodNumber;
   }
 
   function flashScore(element) {
     element.classList.remove('flash');
-    void element.offsetWidth;                                                   // restart the animation
+    void element.offsetWidth;
     element.classList.add('flash');
   }
 
@@ -193,42 +179,65 @@
     previousRightScore = rightScore;
   }
 
-  function setPossession(side) {                                                // "left", "right", or "none"
-    possLeftEl.classList.remove('on');
-    possRightEl.classList.remove('on');
-    if (side === "left") {
-      possLeftEl.classList.add('on');
-    } else if (side === "right") {
-      possRightEl.classList.add('on');
-    }
-  }
-
   function renderCountdown() {
     if (gamePhase !== "pre") {
       return;
     }
-    var millisecondsRemaining = kickoffTime.getTime() - new Date().getTime();
-    if (millisecondsRemaining < 0) {
-      millisecondsRemaining = 0;
+    var millisecondsRemaining = tipoffTime.getTime() - new Date().getTime();
+    centerBox.classList.add('countdown');
+
+    if (millisecondsRemaining <= 0) {                     // past tip, feed hasn't flipped yet
+      centerPrimary.textContent = "TIPOFF";
+      centerSecondary.textContent = "STARTING";
+      return;
     }
+
     var totalSeconds = Math.floor(millisecondsRemaining / 1000);
     var hours = Math.floor(totalSeconds / 3600);
     var minutes = Math.floor((totalSeconds % 3600) / 60);
     var seconds = totalSeconds % 60;
 
-    centerBox.classList.add('countdown');
     centerPrimary.textContent = padNumber(hours) + ":" + padNumber(minutes) + ":" + padNumber(seconds);
-    centerSecondary.textContent = "TIL KICKOFF";
+    centerSecondary.textContent = "TIL TIPOFF";
   }
 
-  function renderLiveClock(displayClock, periodNumber) {
+  function renderLiveClock(displayClock, periodNumber, isHalftime) {
     centerBox.classList.remove('countdown');
-    var periodLabel = quarterLabels[periodNumber];
-    if (!periodLabel) {
-      periodLabel = "Q" + periodNumber;
+    if (isHalftime === true) {
+      centerPrimary.textContent = "HALF";
+      centerSecondary.textContent = "TIME";
+      return;
     }
     centerPrimary.textContent = displayClock;
-    centerSecondary.textContent = periodLabel;
+    centerSecondary.textContent = periodLabelFor(periodNumber);
+  }
+
+  function buildQuarterSummary(leftLinescores, rightLinescores) {
+    var parts = [];
+    var count = Math.min(leftLinescores.length, rightLinescores.length);
+    var startIndex = 0;
+    if (count > 4) {
+      startIndex = count - 4;
+    }
+    var i = startIndex;
+    while (i < count) {
+      parts.push(periodLabelFor(i + 1) + " " + leftLinescores[i] + "-" + rightLinescores[i]);
+      i = i + 1;
+    }
+    return parts.join("   ");
+  }
+
+  function readLinescores(competitor) {
+    var values = [];
+    if (!competitor.linescores) {
+      return values;
+    }
+    var i = 0;
+    while (i < competitor.linescores.length) {
+      values.push(Math.round(competitor.linescores[i].value));
+      i = i + 1;
+    }
+    return values;
   }
 
   function setPollInterval(intervalMilliseconds) {
@@ -242,23 +251,21 @@
     pollTimer = setInterval(pollScoreboard, currentPollInterval);
   }
 
-  /* ---- demo: 2nd quarter drive ending in a Jets touchdown ---- */
   function runDemo() {
     gamePhase = "in";
     logStatus("DEMO MODE - simulated, not live data");
 
-    var jetsScore = 10;
-    var bucsScore = 7;
-    var clockSeconds = 8 * 60 + 24;
+    var netsScore = 42;
+    var sixersScore = 38;
+    var clockSeconds = 7 * 60 + 15;
     var hasScored = false;
 
-    scoreLeftEl.textContent = jetsScore;
-    scoreRightEl.textContent = bucsScore;
-    previousLeftScore = jetsScore;
-    previousRightScore = bucsScore;
-    setPossession("left");
-    stripTextEl.textContent = "2ND & 7";
-    stripSubEl.textContent = "NYJ 34";
+    scoreLeftEl.textContent = netsScore;
+    scoreRightEl.textContent = sixersScore;
+    previousLeftScore = netsScore;
+    previousRightScore = sixersScore;
+    stripTextEl.textContent = "1ST 28-24   2ND 14-14";
+    stripSubEl.textContent = "";
 
     setInterval(function () {
       if (clockSeconds > 0) {
@@ -266,20 +273,13 @@
       }
       var minutes = Math.floor(clockSeconds / 60);
       var seconds = clockSeconds % 60;
-      renderLiveClock(minutes + ":" + padNumber(seconds), 2);
+      renderLiveClock(minutes + ":" + padNumber(seconds), 2, false);
 
-      if (!hasScored && clockSeconds <= (8 * 60 + 18)) {
+      if (!hasScored && clockSeconds <= (7 * 60 + 9)) {
         hasScored = true;
-        jetsScore = jetsScore + 7;
-        applyScores(jetsScore, bucsScore);
-        stripTextEl.textContent = "TOUCHDOWN NYJ";
-        stripSubEl.textContent = "";
-        setPossession("none");
-        setTimeout(function () {
-          stripTextEl.textContent = "1ST & 10";
-          stripSubEl.textContent = "TB 25";
-          setPossession("right");
-        }, 5000);
+        netsScore = netsScore + 3;
+        applyScores(netsScore, sixersScore);
+        stripTextEl.textContent = "1ST 28-24   2ND 17-14";
       }
     }, 1000);
   }
@@ -307,8 +307,8 @@
         }
 
         var competition = matchedEvent.competitions[0];
-        var awayTeam = null;                                                    // TB
-        var homeTeam = null;                                                    // NYJ
+        var awayTeam = null;
+        var homeTeam = null;
         var c = 0;
         while (c < competition.competitors.length) {
           if (competition.competitors[c].homeAway === "away") {
@@ -320,81 +320,51 @@
         }
 
         if (matchedEvent.date) {
-          kickoffTime = new Date(matchedEvent.date);
+          tipoffTime = new Date(matchedEvent.date);
         }
 
         var gameStatus = competition.status;
-        var gameState = gameStatus.type.state;                                  // pre | in | post
+        var gameState = gameStatus.type.state;
         gamePhase = gameState;
         lastGoodUpdate = new Date();
 
         if (gameState === "pre") {
           renderCountdown();
-          var venueName = "MetLife Stadium";
+          var venueName = "Barclays Center";
           if (competition.venue && competition.venue.fullName) {
             venueName = competition.venue.fullName;
           }
           stripTextEl.textContent = venueName;
-          stripSubEl.textContent = kickoffTime.toLocaleTimeString('en-US',
+          stripSubEl.textContent = tipoffTime.toLocaleTimeString('en-US',
             { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
-          setPossession("none");
           setPollInterval(POLL_PREGAME_MS);
-          logStatus("connected - waiting for kickoff");
+          logStatus("connected - waiting for tipoff");
           return;
         }
 
         applyScores(parseInt(homeTeam.score, 10), parseInt(awayTeam.score, 10));
 
+        var quarterSummary = buildQuarterSummary(readLinescores(homeTeam), readLinescores(awayTeam));
+
         if (gameState === "post") {
           centerBox.classList.remove('countdown');
           centerPrimary.textContent = "FINAL";
           centerSecondary.textContent = "";
-          stripTextEl.textContent = "FINAL";
+          stripTextEl.textContent = quarterSummary || "FINAL";
           stripSubEl.textContent = "";
-          setPossession("none");
           setPollInterval(POLL_PREGAME_MS);
           logStatus("final");
           return;
         }
 
-        renderLiveClock(gameStatus.displayClock, gameStatus.period);
-
-        if (competition.situation) {
-          var situation = competition.situation;
-          var downText = situation.downDistanceText;
-          if (!downText) {
-            downText = situation.shortDownDistanceText;
-          }
-          if (!downText) {
-            downText = "";
-          }
-          stripTextEl.textContent = downText;
-
-          var fieldText = "";
-          if (situation.possessionText) {
-            fieldText = situation.possessionText;
-          }
-          if (situation.playClock !== undefined && situation.playClock !== null) {
-            if (fieldText !== "") {
-              fieldText = fieldText + "   :" + padNumber(situation.playClock);
-            } else {
-              fieldText = ":" + padNumber(situation.playClock);
-            }
-          }
-          stripSubEl.textContent = fieldText;
-
-          if (situation.possession === homeTeam.id) {
-            setPossession("left");
-          } else if (situation.possession === awayTeam.id) {
-            setPossession("right");
-          } else {
-            setPossession("none");
-          }
-        } else {
-          stripTextEl.textContent = "";
-          stripSubEl.textContent = "";
-          setPossession("none");
+        var isHalftime = false;
+        if (gameStatus.type.name === "STATUS_HALFTIME") {
+          isHalftime = true;
         }
+        renderLiveClock(gameStatus.displayClock, gameStatus.period, isHalftime);
+
+        stripTextEl.textContent = quarterSummary;
+        stripSubEl.textContent = "";
 
         setPollInterval(POLL_LIVE_MS);
         logStatus("live - updated " + lastGoodUpdate.toLocaleTimeString());
